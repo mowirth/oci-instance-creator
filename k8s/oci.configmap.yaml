@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oci-config
+data:
+  OCI_USER_ID: "ocid1.user.oc1..verlongrandomstring"
+  OCI_TENANCY_ID: "ocid1.tenancy.oc1..verlongrandomstring"
+  OCI_SUBNET_ID: "ocid1.subnet.oc1..verlongrandomstring"
+  OCI_IMAGE_ID: "ocid1.image.oc1..verlongrandomstring"
+  OCI_REGION: "eu-frankfurt-1"
+  OCI_FINGERPRINT: "00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF"
+  SSH_KEY: "ssh-rsa changemeverylongstring also@change.me"
+

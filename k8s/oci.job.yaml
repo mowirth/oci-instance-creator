@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: oci-instance-creator
+spec:
+  template:
+    spec:
+      containers:
+        - name: oci-instance-creator
+          image: mowirth/oci-instance-creator
+          envFrom:
+            - configMapRef:
+                name: oci-config
+          volumeMounts:
+            - mountPath: /keys/oci.key
+              name: oci-secret
+              readOnly: true
+              subPath: oci.key
+      restartPolicy: Never
+      volumes:
+        - name: oci-secret
+          secret:
+            secretName: oci-secret
+  backoffLimit: 3
