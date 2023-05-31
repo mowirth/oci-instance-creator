@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/oracle/oci-go-sdk v24.3.0+incompatible
+	github.com/sirupsen/logrus v1.9.2
 	github.com/spf13/viper v1.15.0
 )
 

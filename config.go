@@ -12,11 +12,18 @@ import (
 	"time"
 
 	"github.com/oracle/oci-go-sdk/core"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
+func init() {
+	logrus.SetFormatter(&logrus.TextFormatter{FullTimestamp: true})
+}
+
 // Configuration represents the internal user configuration for OCI, including the required values for the instance.
 type Configuration struct {
+	// General
+	LogLevel string `mapstructure:"log_level"`
 	// Oracle Cloud / User Configuration
 	UserId      string `mapstructure:"oci_user_id"`     // required
 	TenancyId   string `mapstructure:"oci_tenancy_id"`  // required
@@ -122,6 +129,12 @@ func (s *Configuration) PrivateRSAKey() (*rsa.PrivateKey, error) {
 }
 
 func (s *Configuration) Validate() error {
+	level, err := logrus.ParseLevel(s.LogLevel)
+	if err != nil {
+		return err
+	}
+
+	logrus.SetLevel(level)
 	if len(s.SubnetId) <= 0 || !strings.Contains(s.SubnetId, ".subnet.") {
 		return fmt.Errorf("invalid subnet id please specify with OCI_SUBNET_ID. It should look similar to ocid1.vcn.oc1.your-region.verylongrandomstring, config %v", s)
 	}
@@ -148,6 +161,14 @@ func (s *Configuration) Validate() error {
 
 	if len(s.Fingerprint) <= 0 || !strings.Contains(s.Fingerprint, ":") {
 		return fmt.Errorf("please specify your fingerprint matching the supplied API Key")
+	}
+
+	if !strings.Contains(s.ImageId, s.OciRegion) {
+		return fmt.Errorf("OCI_IMAGE_ID must contain the region identifier")
+	}
+
+	if !strings.Contains(s.SubnetId, s.OciRegion) {
+		return fmt.Errorf("OCI_SUBNET_ID must contain the region identifier")
 	}
 
 	return nil
@@ -178,7 +199,7 @@ func BindEnvs(iface interface{}, parts ...string) {
 			keyDot := strings.Join(append(parts, tv), ".")
 			keyUnderscore := strings.Join(append(parts, tv), "_")
 			if err := viper.BindEnv(keyDot, strings.ToUpper(keyUnderscore)); err != nil {
-				fmt.Printf("Failed to bind %v to %v: %v\n", keyDot, strings.ToUpper(keyUnderscore), err)
+				logrus.Errorf("Failed to bind %v to %v: %v\n", keyDot, strings.ToUpper(keyUnderscore), err)
 			}
 		}
 	}

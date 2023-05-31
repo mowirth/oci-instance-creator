@@ -8,6 +8,7 @@ spec:
       containers:
         - name: oci-instance-creator
           image: mowirth/oci-instance-creator
+          imagePullPolicy: Always
           envFrom:
             - configMapRef:
                 name: oci-config

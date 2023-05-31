@@ -12,6 +12,4 @@ COPY --from=build /go/src/app/bin/oci-instance-creator /oci-instance-creator
 
 ENV KEY_PATH /keys/oci.key
 
-EXPOSE 9234
-
 ENTRYPOINT [ "/oci-instance-creator" ]

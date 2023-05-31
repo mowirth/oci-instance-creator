@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -10,11 +9,13 @@ import (
 	"github.com/oracle/oci-go-sdk/common"
 	"github.com/oracle/oci-go-sdk/core"
 	"github.com/oracle/oci-go-sdk/identity"
+	"github.com/sirupsen/logrus"
 )
 
 func (s *Configuration) createInstancesInAvailabilityZone(ctx context.Context, domains identity.ListAvailabilityDomainsResponse) {
 	for _, domain := range domains.Items {
-		fmt.Printf("Attempting to create new instance in domain %v\n", *domain.Name)
+		logrus.Infof("Attempting to create new instance in domain %v\n", *domain.Name)
+		logrus.Debugf("Current Range: [Attempt Interval: %v, Sleep Time between Zones: %v]", s.CreateIntervalSeconds, s.ZoneIntervalSeconds)
 		s.CreateInstance(ctx, domain)
 		time.Sleep(time.Duration(s.ZoneIntervalSeconds) * time.Second)
 	}
@@ -51,17 +52,22 @@ func (s *Configuration) CreateInstance(ctx context.Context, domain identity.Avai
 
 	resp, err := s.client.LaunchInstance(ctx, req)
 	if err == nil {
-		fmt.Printf("Generated instance in availability zone %v, took %v", domain.Id, time.Since(s.started).String())
+		logrus.Infof("Generated instance in availability zone %v, took %v", domain.Id, time.Since(s.started).String())
 		os.Exit(0)
 	}
 
 	if !strings.Contains(err.Error(), "Out of host capacity") {
-		fmt.Printf("Received error from api: %v; resp: %v, \n req: %v\n\n", err, resp, req)
+		logrus.Infof("Received error from api: %v; resp: %v, \n req: %v\n\n", err, resp, req)
+	} else {
+		logrus.Debugf("OutOfHostCapacity Error: %v", err)
 	}
 
 	if strings.Contains(err.Error(), "error:TooManyRequests") {
-		fmt.Printf("Received too many requests, increasing request time between instances")
-		s.ZoneIntervalSeconds += 5
+		logrus.Infof("Received too many requests, increasing request time between instances, current interval %v", time.Duration(s.ZoneIntervalSeconds).String())
+		logrus.Debugf("Too Many Requests Error: %v", err)
+		if time.Duration(s.ZoneIntervalSeconds) <= 20*time.Second {
+			s.ZoneIntervalSeconds += 1
+		}
 	}
 }
 
