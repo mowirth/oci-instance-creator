@@ -29,7 +29,7 @@ func main() {
 	}
 
 	t := time.NewTicker(time.Duration(config.CreateIntervalSeconds) * time.Second)
-	fmt.Printf("Starting instance generation every %v seconds\n", config.CreateIntervalSeconds)
+	fmt.Printf("Starting instance generation every %v seconds", config.CreateIntervalSeconds)
 	config.createInstancesInAvailabilityZone(ctx, domains)
 	for {
 		select {

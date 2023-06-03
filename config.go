@@ -61,6 +61,7 @@ func (s *Configuration) Read() error {
 	viper.SetDefault("volume_size", 50)
 	viper.SetDefault("create_interval_seconds", 60)
 	viper.SetDefault("create_zone_seconds", 10)
+	viper.SetDefault("log_level", "INFO")
 
 	if err := viper.ReadInConfig(); err != nil {
 		switch err.(type) {
@@ -199,7 +200,7 @@ func BindEnvs(iface interface{}, parts ...string) {
 			keyDot := strings.Join(append(parts, tv), ".")
 			keyUnderscore := strings.Join(append(parts, tv), "_")
 			if err := viper.BindEnv(keyDot, strings.ToUpper(keyUnderscore)); err != nil {
-				logrus.Errorf("Failed to bind %v to %v: %v\n", keyDot, strings.ToUpper(keyUnderscore), err)
+				logrus.Errorf("Failed to bind %v to %v: %v", keyDot, strings.ToUpper(keyUnderscore), err)
 			}
 		}
 	}

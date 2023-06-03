@@ -14,7 +14,7 @@ import (
 
 func (s *Configuration) createInstancesInAvailabilityZone(ctx context.Context, domains identity.ListAvailabilityDomainsResponse) {
 	for _, domain := range domains.Items {
-		logrus.Infof("Attempting to create new instance in domain %v\n", *domain.Name)
+		logrus.Infof("Attempting to create new instance in domain %v", *domain.Name)
 		logrus.Debugf("Current Range: [Attempt Interval: %v, Sleep Time between Zones: %v]", s.CreateIntervalSeconds, s.ZoneIntervalSeconds)
 		s.CreateInstance(ctx, domain)
 		time.Sleep(time.Duration(s.ZoneIntervalSeconds) * time.Second)
@@ -57,7 +57,7 @@ func (s *Configuration) CreateInstance(ctx context.Context, domain identity.Avai
 	}
 
 	if !strings.Contains(err.Error(), "Out of host capacity") {
-		logrus.Infof("Received error from api: %v; resp: %v, \n req: %v\n\n", err, resp, req)
+		logrus.Infof("Received error from api: %v; resp: %v, req: %v", err, resp, req)
 	} else {
 		logrus.Debugf("OutOfHostCapacity Error: %v", err)
 	}
