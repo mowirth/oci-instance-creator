@@ -52,7 +52,8 @@ func (s *Configuration) CreateInstance(ctx context.Context, domain identity.Avai
 
 	resp, err := s.client.LaunchInstance(ctx, req)
 	if err == nil {
-		logrus.Infof("Generated instance in availability zone %v, took %v", domain.Id, time.Since(s.started).String())
+		logrus.Errorf("Generated instance in availability zone %v, took %v", domain.Id, time.Since(s.started).String())
+		logrus.Errorf("[########################] SUCCESS!!!! [########################]")
 		os.Exit(0)
 	}
 
